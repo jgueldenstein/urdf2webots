@@ -203,7 +203,7 @@ def URDFBoundingObject(proto, link, level, boxCollision):
 
     for boundingObject in link.collision:
         initialIndent = boundingLevel * indent if hasGroup else ''
-        if not boxCollision and boundingObject.position != [0.0, 0.0, 0.0] or boundingObject.rotation[3] != 0.0:
+        if not boxCollision and (boundingObject.position != [0.0, 0.0, 0.0] or boundingObject.rotation[3] != 0.0):
             proto.write(initialIndent + 'Transform {\n')
             proto.write((boundingLevel + 1) * indent + 'translation %lf %lf %lf\n' % (boundingObject.position[0],
                                                                                       boundingObject.position[1],
@@ -255,11 +255,16 @@ def URDFBoundingObject(proto, link, level, boxCollision):
                 aabb['minimum']['z'] = min(aabb['minimum']['z'], z)
                 aabb['maximum']['z'] = max(aabb['maximum']['z'], z)
 
+            box_offset = [0.5 * (aabb['maximum']['x'] + aabb['minimum']['x']),
+                          0.5 * (aabb['maximum']['y'] + aabb['minimum']['y']),
+                          0.5 * (aabb['maximum']['z'] + aabb['minimum']['z'])]
+            box_offset_rotated = rotateVector(box_offset, boundingObject.rotation)
+
             proto.write(initialIndent + 'Transform {\n')
             proto.write((boundingLevel + 1) * indent + 'translation %f %f %f\n' % (
-                        0.5 * (aabb['maximum']['x'] + aabb['minimum']['x']) + boundingObject.position[0],
-                        0.5 * (aabb['maximum']['y'] + aabb['minimum']['y']) + boundingObject.position[1],
-                        0.5 * (aabb['maximum']['z'] + aabb['minimum']['z']) + boundingObject.position[2],))
+                        box_offset_rotated[0] + boundingObject.position[0],
+                        box_offset_rotated[1] + boundingObject.position[1],
+                        box_offset_rotated[2] + boundingObject.position[2]))
             proto.write((boundingLevel + 1) * indent + 'rotation %lf %lf %lf %lf\n' % (boundingObject.rotation[0],
                                                                                        boundingObject.rotation[1],
                                                                                        boundingObject.rotation[2],
