@@ -288,17 +288,25 @@ class Camera():
     def export(self, file, indentationLevel):
         """Export this camera."""
         indent = '  '
-        file.write(indentationLevel * indent + 'Camera {\n')
-        file.write(indentationLevel * indent + '  name "%s"\n' % self.name)
+        # rotation to convert from REP103 to webots viewport
+        file.write(indentationLevel * indent + "Transform {\n")
+        file.write(indentationLevel * indent + "rotation 1.0 0.0 0.0 3.141591\n")
+        file.write(indentationLevel * indent + "children [\n")
+
+        file.write((indentationLevel+1) * indent + 'Camera {\n')
+        file.write((indentationLevel+1) * indent + '  name "%s"\n' % self.name)
         if self.fov:
-            file.write(indentationLevel * indent + '  fieldOfView %lf\n' % self.fov)
+            file.write((indentationLevel+1) * indent + '  fieldOfView %lf\n' % self.fov)
         if self.width:
-            file.write(indentationLevel * indent + '  width %d\n' % self.width)
+            file.write((indentationLevel+1) * indent + '  width %d\n' % self.width)
         if self.height:
-            file.write(indentationLevel * indent + '  height %d\n' % self.height)
+            file.write((indentationLevel+1) * indent + '  height %d\n' % self.height)
         if self.noise:
-            file.write(indentationLevel * indent + '  noise %lf\n' % self.noise)
-        file.write(indentationLevel * indent + '}\n')
+            file.write((indentationLevel+1) * indent + '  noise %lf\n' % self.noise)
+        file.write((indentationLevel+1) * indent + '}\n')
+
+        file.write(indentationLevel * indent + "]\n")
+        file.write(indentationLevel * indent + "}\n")
 
 
 class Lidar():
